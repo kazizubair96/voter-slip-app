@@ -56,8 +56,8 @@ const VoterSlip: React.FC<VoterSlipProps> = ({ voter }) => {
 
         <div className="flex justify-between items-start mb-6 border-b border-slate-100 pb-4">
           <div>
-            <h2 className="text-2xl font-bold text-slate-800">ভোটার স্লিপ (ডেমো)</h2>
-            <p className="text-sm text-slate-500">নির্বাচন কমিশন বাংলাদেশ - ডেমো কপি</p>
+            <h2 className="text-2xl font-bold text-slate-800">ভোটার স্লিপ - ত্রয়োদশ জাতীয় সংসদ নির্বাচন</h2>
+            <p className="text-sm text-slate-500">ব্রাহ্মণবাড়িয়া-১ (নাসিরনগর-২৪২)</p>
           </div>
           <div className="bg-emerald-50 text-emerald-600 p-2 rounded-full">
             <CheckCircle size={24} />
@@ -104,7 +104,8 @@ const VoterSlip: React.FC<VoterSlipProps> = ({ voter }) => {
         <div className="mt-8 pt-4 border-t border-dashed border-slate-200">
           <p className="text-[10px] text-center text-slate-400 italic">
             স্লিপ আইডি: {voter.id.toUpperCase()} <br/>
-            দ্রষ্টব্য: এটি শুধুমাত্র একটি ডেমো স্লিপ। এটি কোনো অফিসিয়াল কাজে ব্যবহারযোগ্য নয়।
+            দ্রষ্টব্য: এটি শুধুমাত্র একটি ভোটার স্লিপ। এটি কোনো অফিসিয়াল কাজে ব্যবহারযোগ্য নয়।
+            <br/>  এর ডিজাইন করেছেনঃ কাজী যুবাইর মিসবাহ
           </p>
         </div>
       </div>
