@@ -1,0 +1,5 @@
+{
+  "name": "Voter Slip App",
+  "description": "A clean and modern voter slip lookup demo application built with React, Tailwind CSS, and Supabase integration. Designed for informational and demonstration purposes in Bangla.",
+  "requestFramePermissions": []
+}
