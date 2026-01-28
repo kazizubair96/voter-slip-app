@@ -25,19 +25,41 @@ const VoterForm: React.FC<VoterFormProps> = ({ onSearch, isLoading }) => {
   });
 
   const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawVal = e.target.value.replace(/\D/g, '').slice(0, 8);
+    const val = e.target.value;
+    // ইউজার কি ডিলিট করছেন নাকি নতুন লিখছেন তা চেক করা
+    const isDeleting = val.length < displayDob.length;
+    
+    // শুধুমাত্র সংখ্যাগুলো আলাদা করা (সর্বোচ্চ ৮টি)
+    const rawVal = val.replace(/\D/g, '').slice(0, 8);
+    
     let formatted = "";
+    
     if (rawVal.length > 0) {
-      formatted += rawVal.slice(0, 2);
+      // প্রথম অংশ (দিন)
+      formatted = rawVal.slice(0, 2);
+      
       if (rawVal.length > 2) {
-        formatted += '/' + rawVal.slice(2, 4);
+        formatted += '/';
+        // দ্বিতীয় অংশ (মাস)
+        formatted += rawVal.slice(2, 4);
+        
         if (rawVal.length > 4) {
-          formatted += '/' + rawVal.slice(4, 8);
+          formatted += '/';
+          // তৃতীয় অংশ (বছর)
+          formatted += rawVal.slice(4, 8);
+        } else if (rawVal.length === 4 && !isDeleting) {
+          // ৪টি সংখ্যা হলে অটো স্ল্যাশ কিন্তু ডিলিট করার সময় নয়
+          formatted += '/';
         }
+      } else if (rawVal.length === 2 && !isDeleting) {
+        // ২টি সংখ্যা হলে অটো স্ল্যাশ কিন্তু ডিলিট করার সময় নয়
+        formatted += '/';
       }
     }
+    
     setDisplayDob(formatted);
 
+    // যখন ৮টি ডিজিট পূর্ণ হবে তখনই ডাটাবেজের জন্য YYYY-MM-DD ফরম্যাটে সেভ করা
     if (rawVal.length === 8) {
       const day = rawVal.substring(0, 2);
       const month = rawVal.substring(2, 4);
@@ -52,7 +74,10 @@ const VoterForm: React.FC<VoterFormProps> = ({ onSearch, isLoading }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: { [key: string]: string } = {};
-    if (!displayDob || displayDob.replace(/\D/g, '').length < 8) newErrors.dob = 'true';
+    
+    // ভ্যালিডেশন চেক
+    const digitsOnly = displayDob.replace(/\D/g, '');
+    if (digitsOnly.length < 8) newErrors.dob = 'true';
     if (!formData.ward) newErrors.ward = 'true';
     
     setErrors(newErrors);
