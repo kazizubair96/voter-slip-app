@@ -1,165 +1,318 @@
 
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import { Voter } from '../types';
-import { Printer, Download, CheckCircle, Loader2, Share2, MapPin, Hash } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import { Printer, Download, CheckCircle, Loader2, MapPin, User, Share2 } from 'lucide-react';
 
 interface VoterSlipProps {
   voter: Voter;
 }
 
 const VoterSlip: React.FC<VoterSlipProps> = ({ voter }) => {
-  const slipRef = useRef<HTMLDivElement>(null);
-  const [isDownloading, setIsDownloading] = React.useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   const handlePrint = () => {
     window.print();
   };
 
-  const handleDownload = async () => {
-    if (!slipRef.current) return;
+  /**
+   * ম্যানুয়ালি আইকন ড্র করার ফাংশন
+   */
+  const drawIcon = (ctx: CanvasRenderingContext2D, type: 'voter' | 'pin' | 'check', x: number, y: number, size: number, color: string) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if (type === 'voter') {
+      ctx.beginPath();
+      ctx.arc(size/2, size/3, size/4, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(size*0.1, size*0.9);
+      ctx.quadraticCurveTo(size/2, size*0.4, size*0.9, size*0.9);
+      ctx.stroke();
+    } else if (type === 'pin') {
+      ctx.beginPath();
+      ctx.arc(size/2, size/3, size/3, 0, Math.PI * 2);
+      ctx.moveTo(size/2, size*0.66);
+      ctx.lineTo(size/2, size);
+      ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(size/2, size/3, size/8, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === 'check') {
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(size*0.25, size*0.5);
+      ctx.lineTo(size*0.45, size*0.7);
+      ctx.lineTo(size*0.75, size*0.3);
+      ctx.stroke();
+    }
+    ctx.restore();
+  };
+
+  const getCanvas = async () => {
+    const width = 800;
+    const height = 500;
+    const scale = 4; 
+    const canvas = document.createElement('canvas');
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.scale(scale, scale);
     
+    await document.fonts.ready;
+
+    // ব্যাকগ্রাউন্ড
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    // ডেকোরেশন
+    ctx.fillStyle = '#f0fdf4';
+    ctx.beginPath(); ctx.arc(width + 20, -20, 220, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fef2f2';
+    ctx.beginPath(); ctx.arc(-40, height + 40, 180, 0, Math.PI * 2); ctx.fill();
+
+    // টপ বার
+    const grad = ctx.createLinearGradient(0, 0, width, 0);
+    grad.addColorStop(0, '#006a4e'); grad.addColorStop(1, '#dc2626');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, 8);
+
+    // হেডার সবুজ বক্স ও আইকন
+    ctx.fillStyle = '#006a4e';
+    ctx.beginPath(); ctx.roundRect(40, 40, 70, 70, 18); ctx.fill();
+    drawIcon(ctx, 'voter', 57, 57, 36, '#ffffff');
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '900 38px "Hind Siliguri"';
+    ctx.fillText('ডিজিটাল ভোটার স্লিপ', 125, 78);
+    ctx.fillStyle = '#006a4e';
+    ctx.font = 'bold 15px "Hind Siliguri"';
+    ctx.fillText('নাসিরনগর (২৪৩) | নির্বাচন ২০২৬', 125, 105);
+
+    // কনফিডেন্সিয়াল ব্যাজ
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath(); ctx.roundRect(width - 190, 55, 150, 36, 18); ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.font = '900 12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('CONFIDENTIAL', width - 115, 78);
+    ctx.textAlign = 'left';
+
+    ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(40, 130); ctx.lineTo(width - 40, 130); ctx.stroke();
+
+    // ভোটার তথ্য (বাম পাশ)
+    ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 13px "Hind Siliguri"';
+    ctx.fillText('ভোটারের নাম', 40, 165);
+    ctx.fillStyle = '#0f172a'; ctx.font = '900 36px "Hind Siliguri"';
+    ctx.fillText(voter.full_name, 40, 205);
+
+    ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 12px "Hind Siliguri"';
+    ctx.fillText('পিতা/স্বামী', 40, 255); ctx.fillText('মাতার নাম', 320, 255);
+    ctx.fillStyle = '#475569'; ctx.font = '800 20px "Hind Siliguri"';
+    ctx.fillText(voter.father_name || '—', 40, 285);
+    ctx.fillText(voter.mother_name || '—', 320, 285);
+
+    ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 12px "Hind Siliguri"';
+    ctx.fillText('ভোট কেন্দ্র', 40, 335);
+    drawIcon(ctx, 'pin', 40, 355, 24, '#dc2626');
+    ctx.fillStyle = '#1e293b'; ctx.font = '900 26px "Hind Siliguri"';
+    const centerName = voter.center_name;
+    if(centerName.length > 25) {
+      ctx.fillText(centerName.substring(0, 25), 75, 375);
+      ctx.fillText(centerName.substring(25), 75, 410);
+    } else { ctx.fillText(centerName, 75, 375); }
+
+    // জন্ম তারিখ কার্ড (ডান পাশ)
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath(); ctx.roundRect(width - 320, 150, 280, 75, 25); ctx.fill();
+    ctx.strokeStyle = '#f1f5f9'; ctx.stroke();
+    drawIcon(ctx, 'voter', width - 300, 172, 28, '#2563eb');
+    ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 11px "Hind Siliguri"';
+    ctx.fillText('জন্ম তারিখ', width - 260, 175);
+    ctx.fillStyle = '#334155'; ctx.font = '900 24px sans-serif';
+    ctx.fillText(voter.date_of_birth, width - 260, 205);
+
+    // ভোটার নম্বর কার্ড (সবুজ)
+    ctx.fillStyle = '#006a4e';
+    ctx.beginPath(); ctx.roundRect(width - 320, 245, 280, 175, 40); ctx.fill();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = 'bold 12px "Hind Siliguri"';
+    ctx.fillText('ভোটার নম্বর / সিরিয়াল', width - 290, 285);
+
+    const vNum = voter.voter_number;
+    const fontSize = vNum.length > 12 ? 24 : vNum.length > 10 ? 28 : 32;
+    ctx.fillStyle = 'white';
+    ctx.font = `900 ${fontSize}px sans-serif`;
+    ctx.fillText(vNum, width - 290, 330);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.beginPath(); ctx.moveTo(width - 290, 355); ctx.lineTo(width - 70, 355); ctx.stroke();
+
+    ctx.font = 'bold 16px "Hind Siliguri"';
+    ctx.fillText(`ওয়ার্ড - ${voter.ward}`, width - 290, 390);
+    drawIcon(ctx, 'check', width - 100, 370, 22, '#86efac');
+
+    // ফুটার ডিভাইডার
+    ctx.strokeStyle = '#cbd5e1'; ctx.setLineDash([6, 4]);
+    ctx.beginPath(); ctx.moveTo(40, 440); ctx.lineTo(width - 40, 440); ctx.stroke(); ctx.setLineDash([]);
+    
+    // ফুটার এলাইনমেন্ট: বাম এবং ডান
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#cbd5e1'; ctx.font = 'bold 12px "Hind Siliguri"';
+    ctx.fillText('© ২০২৬ ডিজিটাল নির্বাচনী প্রচার সেল', 40, 475);
+    
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#94a3b8'; ctx.font = 'italic 12px "Hind Siliguri"';
+    ctx.fillText('এটি একটি ডিজিটাল স্লিপ। ভোট প্রদানের সুবিধার্থে এই তথ্যটি সাথে রাখুন।', width - 40, 475);
+
+    return canvas;
+  };
+
+  const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      const canvas = await html2canvas(slipRef.current, {
-        scale: 3,
-        backgroundColor: '#ffffff',
-        logging: false,
-        useCORS: true
-      });
-      
-      const image = canvas.toDataURL("image/png", 1.0);
+      const canvas = await getCanvas();
+      if (!canvas) return;
+      const dataUrl = canvas.toDataURL("image/png", 1.0);
       const link = document.createElement('a');
-      link.download = `voter-slip-nasirnagar-243.png`;
-      link.href = image;
-      link.click();
-    } catch (err) {
-      console.error("Download failed", err);
-      alert("ডাউনলোড করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।");
-    } finally {
-      setIsDownloading(false);
-    }
+      link.download = `voter-slip-${voter.voter_number}.png`;
+      link.href = dataUrl; link.click();
+    } catch (e) {
+      console.error(e); alert("সেভ করা সম্ভব হয়নি।");
+    } finally { setIsDownloading(false); }
+  };
+
+  const handleShare = async () => {
+    setIsSharing(true);
+    try {
+      const canvas = await getCanvas();
+      if (!canvas) return;
+      
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], `voter-slip-${voter.voter_number}.png`, { type: 'image/png' });
+        
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'ডিজিটাল ভোটার স্লিপ',
+              text: `${voter.full_name} এর ভোটার স্লিপ`,
+            });
+          } catch (err) {
+            console.error("Sharing failed", err);
+          }
+        } else {
+          alert("আপনার ব্রাউজারে শেয়ার অপশনটি সাপোর্ট করছে না। ছবি সেভ করে শেয়ার করুন।");
+        }
+      }, 'image/png');
+    } catch (e) {
+      console.error(e);
+    } finally { setIsSharing(false); }
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 w-full max-w-full overflow-hidden">
-      <div 
-        ref={slipRef}
-        id="voter-slip-card"
-        className="relative bg-white border border-slate-200 rounded-2xl md:rounded-[2.5rem] p-5 md:p-12 shadow-xl max-w-2xl mx-auto overflow-hidden"
-      >
-        {/* Decorative Background Elements */}
-        <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-green-50 rounded-full -mr-12 -mt-12 md:-mr-16 md:-mt-16"></div>
-        
-        {/* Watermark - Adjusted for mobile visibility */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] rotate-[-25deg] select-none">
-          <div className="text-center">
-            <p className="text-6xl md:text-9xl font-black">২০২৬</p>
-            <p className="text-2xl md:text-4xl font-bold">নাসিরনগর - ২৪৩</p>
-          </div>
-        </div>
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full max-w-[850px] animate-in fade-in slide-in-from-bottom-6 duration-700">
+        <div id="voter-slip-card" className="relative bg-white border border-slate-200 rounded-[2.5rem] p-6 md:p-10 shadow-2xl overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-green-50 rounded-full -mr-32 -mt-32 opacity-60"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-50 rounded-full -ml-24 -mb-24 opacity-40"></div>
 
-        <div className="relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 md:mb-10 border-b border-slate-100 pb-6 md:pb-8">
-            <div className="text-center md:text-left">
-              <div className="flex items-center gap-2 justify-center md:justify-start mb-1 md:mb-2">
-                <span className="bg-red-600 text-white text-[8px] md:text-[10px] px-2 py-0.5 rounded font-black uppercase tracking-tighter">২০২৬ নির্বাচন</span>
-                <h2 className="text-xl md:text-3xl font-black text-slate-800 tracking-tight">ভোটার স্লিপ</h2>
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-center md:items-start gap-6 border-b border-slate-100 pb-6 mb-8">
+            <div className="flex items-center gap-4 text-center md:text-left">
+              <div className="bg-[#006a4e] p-3 rounded-2xl text-white shadow-lg">
+                <User size={32} />
               </div>
-              <p className="text-[10px] md:text-sm font-bold text-[#006a4e]">ত্রয়োদশ জাতীয় সংসদ নির্বাচন (২৪৩ নাসিরনগর)</p>
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-800">ডিজিটাল ভোটার স্লিপ</h2>
+                <p className="text-xs md:text-sm font-bold text-[#006a4e] uppercase tracking-widest">নাসিরনগর (২৪৩) | নির্বাচন ২০২৬</p>
+              </div>
             </div>
-            <div className="bg-green-100 text-[#006a4e] p-2 md:p-4 rounded-full md:rounded-3xl shadow-inner animate-in zoom-in duration-500 delay-200">
-              <CheckCircle size={24} className="md:w-10 md:h-10" />
-            </div>
+            <div className="bg-red-600 text-white text-[10px] px-4 py-1.5 rounded-full font-black tracking-widest">CONFIDENTIAL</div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 md:gap-y-6 text-slate-700">
-            <div className="space-y-0.5">
-              <span className="text-[9px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">পুরো নাম</span>
-              <p className="font-black text-lg md:text-xl text-slate-900 border-l-4 border-[#006a4e] pl-3">{voter.full_name}</p>
-            </div>
-
-            <div className="space-y-0.5">
-              <span className="text-[9px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">পিতা/স্বামীর নাম</span>
-              <p className="font-bold text-md md:text-lg text-slate-800 border-l-4 border-slate-200 pl-3">{voter.father_name || '—'}</p>
-            </div>
-
-            <div className="space-y-0.5">
-              <span className="text-[9px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">মাতার নাম</span>
-              <p className="font-bold text-md md:text-lg text-slate-800 border-l-4 border-slate-200 pl-3">{voter.mother_name || '—'}</p>
-            </div>
-
-            <div className="space-y-0.5">
-              <span className="text-[9px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">জন্ম তারিখ</span>
-              <p className="font-bold text-md md:text-lg text-slate-800 border-l-4 border-slate-200 pl-3">{voter.date_of_birth}</p>
-            </div>
-            
-            <div className="space-y-1 md:col-span-2 bg-slate-50 p-4 md:p-6 rounded-xl md:rounded-2xl border border-slate-100">
-              <div className="flex items-center gap-2 mb-1 md:mb-2">
-                <MapPin size={14} className="text-red-600 md:w-4 md:h-4" />
-                <span className="text-[9px] md:text-[11px] font-bold text-slate-400 uppercase tracking-widest">আপনার ভোট কেন্দ্র</span>
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-8 text-left">
+            <div className="md:col-span-7 space-y-6">
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">ভোটারের নাম</label>
+                <p className="text-xl md:text-2xl font-black text-slate-900 leading-tight">{voter.full_name}</p>
               </div>
-              <p className="font-black text-lg md:text-2xl text-slate-900 leading-tight">{voter.center_name}</p>
-              <p className="text-[10px] md:text-sm text-[#006a4e] font-bold mt-0.5">নাসিরনগর উপজেলা, ব্রাহ্মণবাড়িয়া-১</p>
-            </div>
-
-            <div className="flex items-center gap-3 md:gap-4 bg-[#006a4e] p-4 md:p-6 rounded-xl md:rounded-2xl md:col-span-2 shadow-lg shadow-green-900/10">
-              <div className="bg-white/20 p-2 md:p-3 rounded-lg md:rounded-xl text-white">
-                <Hash size={18} className="md:w-6 md:h-6" />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">পিতা/স্বামী</label>
+                  <p className="text-sm md:text-base font-bold text-slate-700 truncate">{voter.father_name || '—'}</p>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">মাতার নাম</label>
+                  <p className="text-sm md:text-base font-bold text-slate-700 truncate">{voter.mother_name || '—'}</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <span className="text-[8px] md:text-[10px] font-bold text-green-100 uppercase tracking-widest block">সিরিয়াল / ভোটার নম্বর</span>
-                <p className="text-xl md:text-3xl font-black text-white leading-none">{voter.voter_number}</p>
-              </div>
-              <div className="bg-white/10 px-2 py-1 rounded-lg">
-                <span className="text-[10px] md:text-xs font-bold text-white">ওয়ার্ড-{voter.ward}</span>
+              <div className="pt-2">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">ভোট কেন্দ্র</label>
+                <div className="flex items-start gap-2">
+                  <MapPin size={22} className="text-red-600 mt-1 shrink-0" />
+                  <p className="text-base md:text-xl font-black text-slate-800 leading-tight">{voter.center_name}</p>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2 md:gap-3">
-               <div className="w-8 h-8 md:w-10 md:h-10 bg-slate-100 rounded-full flex items-center justify-center font-black text-slate-400 text-[8px] md:text-xs">ID</div>
-               <div>
-                  <p className="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase">ভেরিফিকেশন আইডি</p>
-                  <p className="text-[9px] md:text-[10px] font-mono text-slate-500 break-all">{voter.id.toUpperCase()}</p>
-               </div>
+            <div className="md:col-span-5 flex flex-col gap-4">
+              <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 flex items-center gap-4">
+                <div className="text-blue-600"><User size={24} /></div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 block uppercase">জন্ম তারিখ</label>
+                  <span className="text-lg font-black text-slate-700">{voter.date_of_birth}</span>
+                </div>
+              </div>
+              <div className="bg-[#006a4e] p-6 rounded-[2rem] text-white shadow-xl flex flex-col justify-center">
+                <label className="text-[10px] font-bold text-green-100 uppercase block mb-1">ভোটার নম্বর / সিরিয়াল</label>
+                <p className="text-2xl md:text-3xl font-black tracking-widest my-2 break-all">{voter.voter_number}</p>
+                <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center text-sm font-bold uppercase tracking-widest">
+                  <span>ওয়ার্ড - {voter.ward}</span>
+                  <CheckCircle size={22} />
+                </div>
+              </div>
             </div>
-            <p className="text-[8px] md:text-[10px] text-center md:text-right text-slate-400 font-bold max-w-[180px] md:max-w-[200px]">
-              দ্রষ্টব্য: এটি একটি ডিজিটাল স্লিপ। ভোট প্রদানের সুবিধার্থে এই তথ্যটি সাথে রাখুন।
-            </p>
           </div>
         </div>
       </div>
 
-      {/* Modern Control Buttons - Responsive Layout */}
-      <div className="mt-6 md:mt-10 grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 md:gap-4 no-print px-2">
+      <div className="mt-10 flex flex-wrap justify-center gap-4 no-print px-4 w-full max-w-4xl">
         <button
-          onClick={handlePrint}
-          className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white p-3 md:px-10 md:py-5 rounded-xl md:rounded-2xl font-black transition-all shadow-xl active:scale-95 text-sm md:text-lg"
+          onClick={handleDownload}
+          disabled={isDownloading || isSharing}
+          className="flex-1 min-w-[140px] flex items-center justify-center gap-3 bg-[#006a4e] hover:bg-[#004d39] disabled:bg-green-300 text-white py-5 rounded-[2rem] font-black transition-all shadow-xl active:scale-95 text-lg"
         >
-          <Printer size={18} className="md:w-[22px] md:h-[22px]" />
-          প্রিন্ট
+          {isDownloading ? <Loader2 className="animate-spin" size={24} /> : <Download size={24} />}
+          <span>{isDownloading ? 'সেভ হচ্ছে...' : 'সেভ করুন'}</span>
         </button>
 
         <button
-          onClick={handleDownload}
-          disabled={isDownloading}
-          className="flex items-center justify-center gap-2 bg-[#006a4e] hover:bg-[#004d39] disabled:bg-green-300 text-white p-3 md:px-10 md:py-5 rounded-xl md:rounded-2xl font-black transition-all shadow-xl active:scale-95 text-sm md:text-lg shadow-green-900/20"
+          onClick={handleShare}
+          disabled={isDownloading || isSharing}
+          className="flex-1 min-w-[140px] flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white py-5 rounded-[2rem] font-black transition-all shadow-xl active:scale-95 text-lg"
         >
-          {isDownloading ? (
-            <Loader2 className="animate-spin" size={18} />
-          ) : (
-            <Download size={18} className="md:w-[22px] md:h-[22px]" />
-          )}
-          <span>{isDownloading ? 'সেভ হচ্ছে...' : 'সেভ করুন'}</span>
+          {isSharing ? <Loader2 className="animate-spin" size={24} /> : <Share2 size={24} />}
+          <span>শেয়ার করুন</span>
         </button>
-        
+
         <button
-          className="col-span-2 md:col-auto flex items-center justify-center gap-2 bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 p-3 md:px-8 md:py-5 rounded-xl md:rounded-2xl font-black transition-all shadow-md active:scale-95 text-sm md:text-lg"
+          onClick={handlePrint}
+          className="flex items-center justify-center gap-3 bg-slate-900 hover:bg-black text-white px-10 py-5 rounded-[2rem] font-black transition-all shadow-xl active:scale-95 text-lg"
         >
-          <Share2 size={18} className="md:w-[22px] md:h-[22px]" />
-          স্লিপ শেয়ার করুন
+          <Printer size={24} />
+          প্রিন্ট
         </button>
       </div>
     </div>
