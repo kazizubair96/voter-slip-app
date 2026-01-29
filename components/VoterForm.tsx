@@ -73,18 +73,18 @@ const VoterForm: React.FC<VoterFormProps> = ({ onSearch, isLoading }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-8 animate-in fade-in duration-700">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+    <form onSubmit={handleSubmit} className="space-y-3 md:space-y-8 animate-in fade-in duration-700">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-8">
         {/* Name Input */}
-        <div className="group space-y-2">
-          <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-            <User size={16} /> নাম (ঐচ্ছিক)
+        <div className="group space-y-1 md:space-y-2">
+          <label className="text-xs md:text-sm font-bold text-slate-700 flex items-center gap-2">
+            <User size={14} /> নাম (ঐচ্ছিক)
           </label>
           <div className="relative">
             <input
               type="text"
               placeholder="নাম বাংলায় বা ইংরেজিতে"
-              className="w-full bg-slate-50 border-2 border-slate-100 px-4 py-3 md:px-5 md:py-4 rounded-xl md:rounded-2xl focus:bg-white focus:border-[#006a4e] outline-none text-base md:text-lg font-medium transition-all"
+              className="w-full bg-slate-50 border-2 border-slate-100 px-3.5 py-2.5 md:px-5 md:py-4 rounded-xl md:rounded-2xl focus:bg-white focus:border-[#006a4e] outline-none text-sm md:text-lg font-medium transition-all"
               value={formData.fullName}
               onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
             />
@@ -92,31 +92,31 @@ const VoterForm: React.FC<VoterFormProps> = ({ onSearch, isLoading }) => {
         </div>
 
         {/* Date of Birth Input */}
-        <div className="group space-y-2">
-          <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-            <Calendar size={16} /> জন্ম তারিখ <span className="text-red-500">*</span>
+        <div className="group space-y-1 md:space-y-2">
+          <label className="text-xs md:text-sm font-bold text-slate-700 flex items-center gap-2">
+            <Calendar size={14} /> জন্ম তারিখ <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <input
               type="text"
               inputMode="numeric"
               placeholder="DD/MM/YYYY"
-              className={`w-full bg-slate-50 border-2 px-4 py-3 md:px-5 md:py-4 rounded-xl md:rounded-2xl focus:bg-white outline-none text-base md:text-lg font-medium transition-all ${errors.dob ? 'border-red-400' : 'border-slate-100 focus:border-[#006a4e]'}`}
+              className={`w-full bg-slate-50 border-2 px-3.5 py-2.5 md:px-5 md:py-4 rounded-xl md:rounded-2xl focus:bg-white outline-none text-sm md:text-lg font-medium transition-all ${errors.dob ? 'border-red-400' : 'border-slate-100 focus:border-[#006a4e]'}`}
               value={displayDob}
               onChange={handleDobChange}
             />
-            {errors.dob && <p className="text-[10px] text-red-500 mt-1 font-bold">সঠিক তারিখ দিন</p>}
+            {errors.dob && <p className="text-[9px] text-red-500 mt-0.5 font-bold">সঠিক তারিখ দিন</p>}
           </div>
         </div>
 
         {/* Ward Select */}
-        <div className="group space-y-2">
-          <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-            <MapPin size={16} /> ওয়ার্ড <span className="text-red-500">*</span>
+        <div className="group space-y-1 md:space-y-2">
+          <label className="text-xs md:text-sm font-bold text-slate-700 flex items-center gap-2">
+            <MapPin size={14} /> ওয়ার্ড <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <select
-              className={`w-full bg-slate-50 border-2 px-4 py-3 md:px-5 md:py-4 rounded-xl md:rounded-2xl focus:bg-white outline-none appearance-none cursor-pointer text-base md:text-lg font-medium transition-all ${errors.ward ? 'border-red-400' : 'border-slate-100 focus:border-[#006a4e]'}`}
+              className={`w-full bg-slate-50 border-2 px-3.5 py-2.5 md:px-5 md:py-4 rounded-xl md:rounded-2xl focus:bg-white outline-none appearance-none cursor-pointer text-sm md:text-lg font-medium transition-all ${errors.ward ? 'border-red-400' : 'border-slate-100 focus:border-[#006a4e]'}`}
               value={formData.ward}
               onChange={(e) => setFormData({ ...formData, ward: e.target.value })}
             >
@@ -125,21 +125,21 @@ const VoterForm: React.FC<VoterFormProps> = ({ onSearch, isLoading }) => {
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
-            {errors.ward && <p className="text-[10px] text-red-500 mt-1 font-bold">ওয়ার্ড নির্বাচন করুন</p>}
+            {errors.ward && <p className="text-[9px] text-red-500 mt-0.5 font-bold">ওয়ার্ড নির্বাচন করুন</p>}
           </div>
         </div>
       </div>
 
-      <div className="flex justify-center pt-4 md:pt-8">
+      <div className="flex justify-center pt-2 md:pt-8">
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full md:w-auto bg-[#006a4e] hover:bg-[#004d39] text-white px-8 py-3.5 md:px-12 md:py-5 rounded-xl md:rounded-2xl font-black text-lg md:text-xl shadow-xl transition-all active:scale-95 disabled:opacity-70 flex items-center justify-center gap-3"
+          className="w-full md:w-auto bg-[#006a4e] hover:bg-[#004d39] text-white px-8 py-3 md:px-12 md:py-5 rounded-xl md:rounded-2xl font-black text-base md:text-xl shadow-xl transition-all active:scale-95 disabled:opacity-70 flex items-center justify-center gap-3"
         >
           {isLoading ? (
-            <Loader2 className="animate-spin" size={24} />
+            <Loader2 className="animate-spin" size={20} />
           ) : (
-            <Search size={24} />
+            <Search size={20} />
           )}
           {isLoading ? 'অনুসন্ধান চলছে...' : 'ভোটার তথ্য দেখুন'}
         </button>

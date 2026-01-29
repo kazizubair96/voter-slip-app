@@ -16,28 +16,33 @@ try {
 
 /**
  * ডাটাবেজ থেকে ভোটার তথ্য খোঁজার ফাংশন
- * এখন শুধুমাত্র জন্মতারিখ এবং ওয়ার্ড নম্বর দিয়ে সার্চ করা হবে।
+ * নাম এখন অপশনাল ফিল্টার হিসেবে কাজ করবে।
  */
 export const findVoterByParams = async (params: SearchParams): Promise<{ data: Voter[] | null; error: any }> => {
   if (!supabase) {
     return { data: null, error: new Error("Supabase is not initialized") };
   }
 
-  // ওয়ার্ড নম্বর নরমাল করা (যেমন: '01' কে '1' বানানো)
+  // ওয়ার্ড নম্বর নরমাল করা
   const normalizedWard = parseInt(params.ward, 10).toString();
   const originalWard = params.ward;
 
-  // জন্মতারিখ এবং ওয়ার্ড দিয়ে সার্চ
-  // আমরা .in() ব্যবহার করছি যাতে '01' অথবা '1' যেকোনোটি মিললেই ডাটা দেখায়
-  const { data, error } = await supabase
+  // বেসিক কুয়েরি তৈরি (জন্মতারিখ এবং ওয়ার্ড বাধ্যতামূলক)
+  let query = supabase
     .from('voters')
     .select('*')
     .eq('date_of_birth', params.dob)
     .in('ward', [originalWard, normalizedWard]);
 
-  // যদি ফলাফল পাওয়া যায়, তবে সেটি রিটার্ন করা
+  // যদি নাম প্রদান করা হয়, তবে নামের আংশিক মিল খোঁজা হবে (Case-insensitive)
+  if (params.fullName && params.fullName.trim()) {
+    query = query.ilike('full_name', `%${params.fullName.trim()}%`);
+  }
+
+  const { data, error } = await query;
+
+  // যদি ফলাফল পাওয়া যায় এবং ভোটার নম্বর থাকে, তবে অতিরিক্ত ফিল্টার
   if (data && data.length > 0) {
-    // যদি একই সাথে একাধিক তথ্য আসে এবং ইউজার ভোটার নম্বর দিয়ে থাকে, তবে সেটি দিয়ে ফিল্টার করা
     if (params.voterNumber && params.voterNumber.trim()) {
       const filtered = data.filter(v => v.voter_number === params.voterNumber.trim());
       if (filtered.length > 0) return { data: filtered, error: null };

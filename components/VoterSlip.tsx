@@ -289,31 +289,31 @@ const VoterSlip: React.FC<VoterSlipProps> = ({ voter }) => {
       </div>
 
       {/* Compact Action Buttons for Mobile */}
-      <div className="mt-5 md:mt-10 flex flex-wrap justify-center gap-2.5 no-print px-4 w-full max-w-4xl">
+      <div className="mt-4 md:mt-10 flex flex-wrap justify-center gap-2 no-print px-4 w-full max-w-4xl">
         <button
           onClick={handleDownload}
           disabled={isDownloading || isSharing}
-          className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#006a4e] hover:bg-[#004d39] disabled:bg-green-300 text-white py-2.5 px-4 md:py-3.5 md:px-8 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-xs md:text-base"
+          className="flex-1 md:flex-none flex items-center justify-center gap-1.5 bg-[#006a4e] hover:bg-[#004d39] disabled:bg-green-300 text-white py-2 md:py-3.5 md:px-8 rounded-lg md:rounded-xl font-bold transition-all shadow-lg active:scale-95 text-[10px] md:text-base"
         >
-          {isDownloading ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
+          {isDownloading ? <Loader2 className="animate-spin" size={12} /> : <Download size={12} className="md:w-4 md:h-4" />}
           <span>{isDownloading ? 'সেভ হচ্ছে...' : 'সেভ করুন'}</span>
         </button>
 
         <button
           onClick={handleShare}
           disabled={isDownloading || isSharing}
-          className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white py-2.5 px-4 md:py-3.5 md:px-8 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-xs md:text-base"
+          className="flex-1 md:flex-none flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white py-2 md:py-3.5 md:px-8 rounded-lg md:rounded-xl font-bold transition-all shadow-lg active:scale-95 text-[10px] md:text-base"
         >
-          {isSharing ? <Loader2 className="animate-spin" size={16} /> : <Share2 size={16} />}
+          {isSharing ? <Loader2 className="animate-spin" size={12} /> : <Share2 size={12} className="md:w-4 md:h-4" />}
           <span>শেয়ার</span>
         </button>
 
         <button
           onClick={handlePrint}
-          className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white py-2.5 px-5 md:py-3.5 md:px-8 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-xs md:text-base"
+          className="flex-1 md:flex-none flex items-center justify-center gap-1.5 bg-slate-900 hover:bg-black text-white py-2 md:py-3.5 md:px-8 rounded-lg md:rounded-xl font-bold transition-all shadow-lg active:scale-95 text-[10px] md:text-base"
         >
-          <Printer size={16} />
-          প্রিন্ট
+          <Printer size={12} className="md:w-4 md:h-4" />
+          <span>প্রিন্ট</span>
         </button>
       </div>
     </div>
