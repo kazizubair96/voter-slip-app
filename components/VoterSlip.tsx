@@ -168,7 +168,7 @@ const VoterSlip: React.FC<VoterSlipProps> = ({ voter }) => {
     ctx.strokeStyle = '#cbd5e1'; ctx.setLineDash([6, 4]);
     ctx.beginPath(); ctx.moveTo(40, 440); ctx.lineTo(width - 40, 440); ctx.stroke(); ctx.setLineDash([]);
     
-    // ফুটার এলাইনমেন্ট: বাম এবং ডান
+    // ফুটার এলাইনমেন্ট: বাম এবং ডান (একই লাইনে)
     ctx.textAlign = 'left';
     ctx.fillStyle = '#cbd5e1'; ctx.font = 'bold 12px "Hind Siliguri"';
     ctx.fillText('© ২০২৬ ডিজিটাল নির্বাচনী প্রচার সেল', 40, 475);
@@ -226,61 +226,62 @@ const VoterSlip: React.FC<VoterSlipProps> = ({ voter }) => {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full max-w-[850px] animate-in fade-in slide-in-from-bottom-6 duration-700">
-        <div id="voter-slip-card" className="relative bg-white border border-slate-200 rounded-[2.5rem] p-6 md:p-10 shadow-2xl overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-green-50 rounded-full -mr-32 -mt-32 opacity-60"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-50 rounded-full -ml-24 -mb-24 opacity-40"></div>
+        <div id="voter-slip-card" className="relative bg-white border border-slate-200 rounded-3xl md:rounded-[2.5rem] p-4 md:p-10 shadow-xl overflow-hidden">
+          {/* Background shapes scaled down for mobile */}
+          <div className="absolute top-0 right-0 w-48 h-48 md:w-64 md:h-64 bg-green-50 rounded-full -mr-24 -mt-24 md:-mr-32 md:-mt-32 opacity-60"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 md:w-48 md:h-48 bg-red-50 rounded-full -ml-16 -mb-16 md:-ml-24 md:-mb-24 opacity-40"></div>
 
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-center md:items-start gap-6 border-b border-slate-100 pb-6 mb-8">
-            <div className="flex items-center gap-4 text-center md:text-left">
-              <div className="bg-[#006a4e] p-3 rounded-2xl text-white shadow-lg">
-                <User size={32} />
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-center md:items-start gap-4 md:gap-6 border-b border-slate-100 pb-4 md:pb-6 mb-4 md:mb-8">
+            <div className="flex items-center gap-3 md:gap-4 text-center md:text-left">
+              <div className="bg-[#006a4e] p-2 md:p-3 rounded-xl md:rounded-2xl text-white shadow-lg">
+                <User size={24} className="md:w-8 md:h-8" />
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-black text-slate-800">ডিজিটাল ভোটার স্লিপ</h2>
-                <p className="text-xs md:text-sm font-bold text-[#006a4e] uppercase tracking-widest">নাসিরনগর (২৪৩) | নির্বাচন ২০২৬</p>
+                <h2 className="text-lg md:text-3xl font-black text-slate-800">ডিজিটাল ভোটার স্লিপ</h2>
+                <p className="text-[10px] md:text-sm font-bold text-[#006a4e] uppercase tracking-widest">নাসিরনগর (২৪৩) | ২০২৬</p>
               </div>
             </div>
-            <div className="bg-red-600 text-white text-[10px] px-4 py-1.5 rounded-full font-black tracking-widest">CONFIDENTIAL</div>
+            <div className="bg-red-600 text-white text-[8px] md:text-[10px] px-3 py-1 md:px-4 md:py-1.5 rounded-full font-black tracking-widest">CONFIDENTIAL</div>
           </div>
 
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-8 text-left">
-            <div className="md:col-span-7 space-y-6">
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 text-left">
+            <div className="md:col-span-7 space-y-4 md:space-y-6">
               <div>
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">ভোটারের নাম</label>
-                <p className="text-xl md:text-2xl font-black text-slate-900 leading-tight">{voter.full_name}</p>
+                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">ভোটারের নাম</label>
+                <p className="text-lg md:text-2xl font-black text-slate-900 leading-tight">{voter.full_name}</p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">পিতা/স্বামী</label>
-                  <p className="text-sm md:text-base font-bold text-slate-700 truncate">{voter.father_name || '—'}</p>
+                  <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">পিতা/স্বামী</label>
+                  <p className="text-xs md:text-base font-bold text-slate-700 truncate">{voter.father_name || '—'}</p>
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">মাতার নাম</label>
-                  <p className="text-sm md:text-base font-bold text-slate-700 truncate">{voter.mother_name || '—'}</p>
+                  <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">মাতার নাম</label>
+                  <p className="text-xs md:text-base font-bold text-slate-700 truncate">{voter.mother_name || '—'}</p>
                 </div>
               </div>
-              <div className="pt-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">ভোট কেন্দ্র</label>
+              <div className="pt-1 md:pt-2">
+                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">ভোট কেন্দ্র</label>
                 <div className="flex items-start gap-2">
-                  <MapPin size={22} className="text-red-600 mt-1 shrink-0" />
-                  <p className="text-base md:text-xl font-black text-slate-800 leading-tight">{voter.center_name}</p>
+                  <MapPin size={16} className="text-red-600 mt-1 shrink-0 md:w-[22px] md:h-[22px]" />
+                  <p className="text-sm md:text-xl font-black text-slate-800 leading-tight">{voter.center_name}</p>
                 </div>
               </div>
             </div>
-            <div className="md:col-span-5 flex flex-col gap-4">
-              <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 flex items-center gap-4">
-                <div className="text-blue-600"><User size={24} /></div>
+            <div className="md:col-span-5 flex flex-col gap-3 md:gap-4">
+              <div className="bg-slate-50 p-3 md:p-4 rounded-2xl md:rounded-3xl border border-slate-100 flex items-center gap-3">
+                <div className="text-blue-600"><User size={18} className="md:w-6 md:h-6" /></div>
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block uppercase">জন্ম তারিখ</label>
-                  <span className="text-lg font-black text-slate-700">{voter.date_of_birth}</span>
+                  <label className="text-[9px] md:text-[10px] font-bold text-slate-400 block uppercase">জন্ম তারিখ</label>
+                  <span className="text-sm md:text-lg font-black text-slate-700">{voter.date_of_birth}</span>
                 </div>
               </div>
-              <div className="bg-[#006a4e] p-6 rounded-[2rem] text-white shadow-xl flex flex-col justify-center">
-                <label className="text-[10px] font-bold text-green-100 uppercase block mb-1">ভোটার নম্বর / সিরিয়াল</label>
-                <p className="text-2xl md:text-3xl font-black tracking-widest my-2 break-all">{voter.voter_number}</p>
-                <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center text-sm font-bold uppercase tracking-widest">
+              <div className="bg-[#006a4e] p-4 md:p-6 rounded-2xl md:rounded-[2rem] text-white shadow-xl flex flex-col justify-center">
+                <label className="text-[9px] md:text-[10px] font-bold text-green-100 uppercase block mb-0.5">ভোটার নম্বর / সিরিয়াল</label>
+                <p className="text-xl md:text-3xl font-black tracking-widest my-1 md:my-2 break-all">{voter.voter_number}</p>
+                <div className="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-white/10 flex justify-between items-center text-[10px] md:text-sm font-bold uppercase tracking-widest">
                   <span>ওয়ার্ড - {voter.ward}</span>
-                  <CheckCircle size={22} />
+                  <CheckCircle size={16} className="md:w-[22px] md:h-[22px]" />
                 </div>
               </div>
             </div>
@@ -288,30 +289,31 @@ const VoterSlip: React.FC<VoterSlipProps> = ({ voter }) => {
         </div>
       </div>
 
-      <div className="mt-10 flex flex-wrap justify-center gap-4 no-print px-4 w-full max-w-4xl">
+      {/* Action Buttons - Smaller as requested */}
+      <div className="mt-6 md:mt-10 flex flex-wrap justify-center gap-3 no-print px-4 w-full max-w-4xl">
         <button
           onClick={handleDownload}
           disabled={isDownloading || isSharing}
-          className="flex-1 min-w-[140px] flex items-center justify-center gap-3 bg-[#006a4e] hover:bg-[#004d39] disabled:bg-green-300 text-white py-5 rounded-[2rem] font-black transition-all shadow-xl active:scale-95 text-lg"
+          className="flex-1 md:flex-none min-w-[120px] flex items-center justify-center gap-2 bg-[#006a4e] hover:bg-[#004d39] disabled:bg-green-300 text-white py-3 px-6 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-sm md:text-base"
         >
-          {isDownloading ? <Loader2 className="animate-spin" size={24} /> : <Download size={24} />}
+          {isDownloading ? <Loader2 className="animate-spin" size={20} /> : <Download size={20} />}
           <span>{isDownloading ? 'সেভ হচ্ছে...' : 'সেভ করুন'}</span>
         </button>
 
         <button
           onClick={handleShare}
           disabled={isDownloading || isSharing}
-          className="flex-1 min-w-[140px] flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white py-5 rounded-[2rem] font-black transition-all shadow-xl active:scale-95 text-lg"
+          className="flex-1 md:flex-none min-w-[120px] flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white py-3 px-6 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-sm md:text-base"
         >
-          {isSharing ? <Loader2 className="animate-spin" size={24} /> : <Share2 size={24} />}
+          {isSharing ? <Loader2 className="animate-spin" size={20} /> : <Share2 size={20} />}
           <span>শেয়ার করুন</span>
         </button>
 
         <button
           onClick={handlePrint}
-          className="flex items-center justify-center gap-3 bg-slate-900 hover:bg-black text-white px-10 py-5 rounded-[2rem] font-black transition-all shadow-xl active:scale-95 text-lg"
+          className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white py-3 px-6 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-sm md:text-base"
         >
-          <Printer size={24} />
+          <Printer size={20} />
           প্রিন্ট
         </button>
       </div>
